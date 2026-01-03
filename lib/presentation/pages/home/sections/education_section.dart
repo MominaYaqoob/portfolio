@@ -102,7 +102,7 @@ class _EducationSectionState extends State<EducationSection>
       sectionTitle: "education",
       title1: "Academic",
       title2: "Background",
-      body: "Strong educational foundation in Computer Science with specialized training in mobile app development. Continuously learning and applying modern technologies.",
+      body: "Pursuing BS Software Engineering at University of Gujrat. Strong foundation in computer science with focus on mobile app development and modern technologies.",
     );
   }
 
@@ -111,7 +111,7 @@ class _EducationSectionState extends State<EducationSection>
       sectionTitle: "education",
       title1: "Academic",
       title2: "Background",
-      body: "Strong educational foundation in Computer Science with specialized training in mobile app development. Continuously learning and applying modern technologies.",
+      body: "Pursuing BS Software Engineering at University of Gujrat. Strong foundation in computer science with focus on mobile app development and modern technologies.",
     );
   }
 

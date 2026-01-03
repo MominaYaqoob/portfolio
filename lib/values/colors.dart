@@ -1,10 +1,10 @@
 part of 'values.dart';
 
 class AppColors {
-  static const Color primaryColor = Color(0xFFF6C350);
+  static const Color primaryColor = Color(0xFF4DB6AC);
   //Shades of primary color
-  static const Color primary200 = Color(0xFFF3B03D);
-  static const Color primary300 = Color(0xFFDEA137);
+  static const Color primary200 = Color(0xFF26A69A);
+  static const Color primary300 = Color(0xFF00897B);
 
   static const Color secondaryColor = Color(0xFF202020);
 
@@ -31,14 +31,14 @@ class AppColors {
   //Blue
   static const Color blue300 = Color(0xFF2867F0);
 
-  //Yellow
-  static const Color yellow10 = Color(0xFFFBE8C5);
-  static const Color yellow100 = Color(0xFFF7C259);
-  static const Color yellow300 = Color(0xFFF3AF3D);
-  static const Color yellow400 = Color(0xFFF4B140);
-  static const Color yellow450 = Color(0xFFF4B03E);
-  static const Color yellow500 = Color(0xFFF4B13E);
-  static const Color yellow700 = Color(0xFFDC9F37);
+  //Teal (replacing Yellow)
+  static const Color yellow10 = Color(0xFFB2DFDB); // Light teal
+  static const Color yellow100 = Color(0xFF80CBC4); // Light-medium teal
+  static const Color yellow300 = Color(0xFF4DB6AC); // Medium teal
+  static const Color yellow400 = Color(0xFF26A69A); // Medium-dark teal
+  static const Color yellow450 = Color(0xFF00897B); // Medium-dark teal variant
+  static const Color yellow500 = Color(0xFF00796B); // Dark teal
+  static const Color yellow700 = Color(0xFF00695C); // Darker teal
 
   //Pink
   static const Color pink300 = Color(0xFFDC5687);

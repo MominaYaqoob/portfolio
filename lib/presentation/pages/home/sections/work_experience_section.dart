@@ -114,7 +114,7 @@ class _WorkExperienceSectionState extends State<WorkExperienceSection>
       sectionTitle: "work experience",
       title1: "Professional",
       title2: "Experience",
-      body: "Building production-level applications and leading teams in Flutter development. Experience across startups and established companies.",
+      body: "Hands-on experience building modern, user-friendly mobile applications with Flutter. Working on Firebase integrations, REST APIs, and UI/UX improvements.",
     );
   }
 
@@ -123,7 +123,7 @@ class _WorkExperienceSectionState extends State<WorkExperienceSection>
       sectionTitle: "work experience",
       title1: "Professional",
       title2: "Experience",
-      body: "Building production-level applications and leading teams in Flutter development. Experience across startups and established companies.",
+      body: "Hands-on experience building modern, user-friendly mobile applications with Flutter. Working on Firebase integrations, REST APIs, and UI/UX improvements.",
     );
   }
 

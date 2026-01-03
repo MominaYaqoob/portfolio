@@ -228,7 +228,7 @@ class _HomePageState extends State<HomePage>
           message: StringConst.WHATSAPP_MESSAGE,
         ),
         FloatingGmailButton(
-          gmailAddress: 'hamzamunir3914@gmail.com',
+          gmailAddress: 'Mominayaqoob00@gmail.com',
           subject: 'Hello from Portfolio',
         )
       ],
