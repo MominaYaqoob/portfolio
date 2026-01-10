@@ -15,6 +15,7 @@ jobs:
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PORTFOLIP_WEBSITE }}
+          firebaseServiceAccount: ${{
+            secrets.FIREBASE_SERVICE_ACCOUNT_MOMINAYAQOOB_PORTFOLIO_WEBSITE }}
           channelId: live
-          projectId: portfolip-website
+          projectId: mominayaqoob-portfolio-website
