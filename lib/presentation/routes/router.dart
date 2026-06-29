@@ -1,11 +1,15 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:nimbus/presentation/pages/home/home_page.dart';
-import 'package:auto_route/annotations.dart';
 
-@MaterialAutoRouter(
-  replaceInRouteName: 'Page,Route',
-  routes: <AutoRoute>[
-    // initial route is named "/"
-    AutoRoute(page: HomePage, initial: true)
-  ],
-)
-class $AppRouter {}
+part 'router.gr.dart';
+
+@AutoRouterConfig(replaceInRouteName: 'Page,Route')
+class AppRouter extends RootStackRouter {
+  @override
+  RouteType get defaultRouteType => RouteType.material();
+
+  @override
+  List<AutoRoute> get routes => [
+        AutoRoute(page: HomeRoute.page, initial: true),
+      ];
+}

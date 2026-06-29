@@ -1,24 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:nimbus/presentation/layout/adaptive.dart';
-import 'package:nimbus/presentation/widgets/content_area.dart';
-import 'package:nimbus/presentation/widgets/nimbus_info_section.dart';
+import 'package:nimbus/presentation/widgets/page_section.dart';
 import 'package:nimbus/presentation/widgets/project_item.dart';
+import 'package:nimbus/presentation/widgets/section_header.dart';
 import 'package:nimbus/presentation/widgets/spaces.dart';
 import 'package:nimbus/values/values.dart';
-import 'package:responsive_builder/responsive_builder.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 class ProjectsSection extends StatefulWidget {
   ProjectsSection({Key? key});
 
   @override
-  _ProjectsSectionState createState() => _ProjectsSectionState();
+  State<ProjectsSection> createState() => _ProjectsSectionState();
 }
 
 class _ProjectsSectionState extends State<ProjectsSection>
     with SingleTickerProviderStateMixin {
   late AnimationController _projectController;
   late Animation<double> _projectScaleAnimation;
+
+  static const double _gridSpacing = 20;
 
   @override
   void initState() {
@@ -27,20 +28,14 @@ class _ProjectsSectionState extends State<ProjectsSection>
       duration: const Duration(milliseconds: 500),
       vsync: this,
     );
-    _projectScaleAnimation = Tween<double>(
-      begin: 0,
-      end: 1,
-    ).animate(
+    _projectScaleAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
         parent: _projectController,
         curve: Curves.fastOutSlowIn,
       ),
     );
-    // Start animation immediately so projects are visible
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        _playProjectAnimation();
-      }
+      if (mounted) _playProjectAnimation();
     });
   }
 
@@ -54,200 +49,157 @@ class _ProjectsSectionState extends State<ProjectsSection>
     try {
       await _projectController.forward().orCancel;
     } on TickerCanceled {
-      // the animation got canceled, probably because it was disposed of
+      // disposed
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = widthOfScreen(context) - (getSidePadding(context) * 2);
-    double contentAreaWidth = screenWidth;
+    final isMobile = widthOfScreen(context) < 768;
+
     return VisibilityDetector(
-      key: Key('project-section'),
+      key: const Key('project-section'),
       onVisibilityChanged: (visibilityInfo) {
-        double visiblePercentage = visibilityInfo.visibleFraction * 100;
-        if (visiblePercentage > 20) {
+        if (visibilityInfo.visibleFraction * 100 > 20) {
           _playProjectAnimation();
         }
       },
-      child: ResponsiveBuilder(
-        refinedBreakpoints: RefinedBreakpoints(),
-        builder: (context, sizingInformation) {
-          double screenWidth = sizingInformation.screenSize.width;
-          if (screenWidth < (RefinedBreakpoints().tabletLarge)) {
-            return Container(
-              padding:
-                  EdgeInsets.symmetric(horizontal: getSidePadding(context)),
-              child: ContentArea(
-                width: contentAreaWidth,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildNimbusInfoSectionSm(),
-                    SpaceH40(),
-                    _buildLiveProjectsSection(isMobile: true),
-                    SpaceH60(),
-                    _buildOfflineProjectsSection(isMobile: true),
-                  ],
-                ),
-              ),
-            );
-          } else {
-            return Column(
-              children: [
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: getSidePadding(context),
-                  ),
-                  child: ContentArea(
-                    width: contentAreaWidth,
-                    child: _buildNimbusInfoSectionLg(),
-                  ),
-                ),
-                SpaceH40(),
-                _buildLiveProjectsSection(isMobile: false),
-                SpaceH60(),
-                _buildOfflineProjectsSection(isMobile: false),
-              ],
-            );
-          }
-        },
+      child: PageSection(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildProjectsHeader(),
+            SpaceH40(),
+            _buildLiveProjectsSection(isMobile: isMobile),
+            SpaceH60(),
+            _buildComingSoonSection(isMobile: isMobile),
+            SpaceH60(),
+            _buildOfflineProjectsSection(isMobile: isMobile),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildNimbusInfoSectionSm() {
-    return NimbusInfoSection2(
-      sectionTitle: StringConst.MY_WORKS,
-      title1: StringConst.MEET_MY_PROJECTS,
-      hasTitle2: false,
-      body: StringConst.PROJECTS_DESC,
+  Widget _buildProjectsHeader() {
+    return SectionHeader(
+      label: StringConst.PROJECTS_LABEL,
+      title: StringConst.PROJECTS_TITLE,
+      subtitle: StringConst.PROJECTS_DESC,
     );
   }
 
-  Widget _buildNimbusInfoSectionLg() {
-    return NimbusInfoSection1(
-      sectionTitle: StringConst.MY_WORKS,
-      title1: StringConst.MEET_MY_PROJECTS,
-      hasTitle2: false,
-      body: StringConst.PROJECTS_DESC,
+  Widget _buildSectionTitle(String title, String subtitle) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+        ),
+        SpaceH12(),
+        Text(
+          subtitle,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppColors.grey250,
+              ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildComingSoonSection({required bool isMobile}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle(
+          StringConst.COMING_SOON,
+          StringConst.COMING_SOON_DESC,
+        ),
+        SpaceH30(),
+        _buildProjectGrid(Data.comingSoonProjects, isMobile: isMobile),
+      ],
     );
   }
 
   Widget _buildLiveProjectsSection({required bool isMobile}) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: getSidePadding(context)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            StringConst.LIVE_PROJECTS_TITLE,
-            style: Theme.of(context).textTheme.headline4?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.black,
-                ),
-          ),
-          SpaceH20(),
-          Text(
-            StringConst.LIVE_PROJECTS_DESC,
-            style: Theme.of(context).textTheme.bodyText1?.copyWith(
-                  color: AppColors.grey350,
-                ),
-          ),
-          SpaceH40(),
-          Wrap(
-            spacing: isMobile ? 16.0 : assignWidth(context, 0.025),
-            runSpacing: isMobile ? assignHeight(context, 0.05) : assignWidth(context, 0.025),
-            children: _buildProjects(Data.liveProjects, isMobile: isMobile),
-          ),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle(
+          StringConst.LIVE_PROJECTS_TITLE,
+          StringConst.LIVE_PROJECTS_DESC,
+        ),
+        SpaceH30(),
+        _buildProjectGrid(Data.liveProjects, isMobile: isMobile),
+      ],
     );
   }
 
   Widget _buildOfflineProjectsSection({required bool isMobile}) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: getSidePadding(context)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            StringConst.OFFLINE_PROJECTS_TITLE,
-            style: Theme.of(context).textTheme.headline4?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.black,
-                ),
-          ),
-          SpaceH20(),
-          Text(
-            StringConst.OFFLINE_PROJECTS_DESC,
-            style: Theme.of(context).textTheme.bodyText1?.copyWith(
-                  color: AppColors.grey350,
-                ),
-          ),
-          SpaceH40(),
-          Wrap(
-            spacing: isMobile ? 16.0 : assignWidth(context, 0.025),
-            runSpacing: isMobile ? assignHeight(context, 0.05) : assignWidth(context, 0.025),
-            // Show 3 offline projects per row on web, keep mobile layout unchanged
-            children: _buildProjects(
-              Data.offlineProjects,
-              isMobile: isMobile,
-              itemsPerRow: 3,
-            ),
-          ),
-        ],
-      ),
+    if (Data.offlineProjects.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle(
+          StringConst.OFFLINE_PROJECTS_TITLE,
+          StringConst.OFFLINE_PROJECTS_DESC,
+        ),
+        SpaceH30(),
+        _buildProjectGrid(Data.offlineProjects, isMobile: isMobile),
+      ],
     );
   }
 
-  List<Widget> _buildProjects(
+  /// Two-column grid on tablet/desktop; single column on narrow screens.
+  Widget _buildProjectGrid(
     List<ProjectData> data, {
-    bool isMobile = false,
-    int itemsPerRow = 2, // default: 2 items per row for web (live projects)
+    required bool isMobile,
   }) {
-    List<Widget> items = [];
-    double screenWidth = widthOfScreen(context) - (getSidePadding(context) * 2);
-    
-    for (int index = 0; index < data.length; index++) {
-      double projectWidth;
-      if (isMobile) {
-        // Mobile: use mobileWidth (typically 1.0 for full width)
-        projectWidth = assignWidth(context, data[index].mobileWidth);
-      } else {
-        // Desktop/Web: calculate width based on desired items per row
-        // Account for spacing between projects - use same spacing as Wrap widget
-        double spacing = assignWidth(context, 0.025);
-        int perRow = itemsPerRow.clamp(1, 4); // basic safety clamp
-        double totalSpacing = spacing * (perRow - 1);
-        // Available width is screenWidth (which already accounts for side padding)
-        projectWidth = (screenWidth - totalSpacing) / perRow;
-      }
-      
-      items.add(
-        ScaleTransition(
+    if (data.isEmpty) return const SizedBox.shrink();
+
+    final crossAxisCount = isMobile ? 1 : 2;
+    final screenWidth = widthOfScreen(context) - (getSidePadding(context) * 2);
+    final cardWidth =
+        (screenWidth - _gridSpacing * (crossAxisCount - 1)) / crossAxisCount;
+    final cardHeight = isMobile
+        ? assignHeight(context, 0.3)
+        : cardWidth * 0.72;
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: crossAxisCount,
+        crossAxisSpacing: _gridSpacing,
+        mainAxisSpacing: _gridSpacing,
+        mainAxisExtent: cardHeight,
+      ),
+      itemCount: data.length,
+      itemBuilder: (context, index) {
+        final project = data[index];
+        return ScaleTransition(
           scale: _projectScaleAnimation,
           child: ProjectItem(
-            width: projectWidth,
-            height: isMobile
-                ? assignHeight(context, data[index].mobileHeight)
-                : assignHeight(context, data[index].height),
-            bannerHeight: isMobile
-                ? assignHeight(context, data[index].mobileHeight) / 2
-                : assignHeight(context, data[index].height) / 3,
-            title: data[index].title,
-            subtitle: data[index].category,
-            imageUrl: data[index].projectCoverUrl,
-            isLive: data[index].isLive,
-            githubUrl: data[index].githubUrl,
-            playStoreUrl: data[index].playStoreUrl,
-            appStoreUrl: data[index].appStoreUrl,
+            width: cardWidth,
+            height: cardHeight,
+            title: project.title,
+            subtitle: project.category,
+            description: project.description,
+            techStack: project.techStack,
+            previewType: project.previewType,
+            isLive: project.isLive,
+            isComingSoon: project.isComingSoon,
+            githubUrl: project.githubUrl,
+            playStoreUrl: project.playStoreUrl,
+            appStoreUrl: project.appStoreUrl,
+            liveUrl: project.liveUrl,
           ),
-        ),
-      );
-    }
-
-    return items;
+        );
+      },
+    );
   }
 }

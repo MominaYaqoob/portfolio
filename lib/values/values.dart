@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:nimbus/presentation/pages/home/sections/statistics_section.dart';
+import 'package:nimbus/presentation/widgets/app_icon.dart';
 import 'package:nimbus/presentation/widgets/buttons/social_button.dart';
-import 'package:nimbus/presentation/widgets/buttons/social_button_2.dart';
-import 'package:nimbus/presentation/widgets/nimbus_card.dart';
 import 'package:nimbus/presentation/widgets/project_item.dart';
-import 'package:nimbus/presentation/widgets/skill_card.dart';
-import 'package:nimbus/presentation/widgets/skill_level.dart';
+import 'package:nimbus/presentation/widgets/project_preview.dart';
 
 part 'colors.dart';
 part 'borders.dart';
@@ -20,8 +17,6 @@ part 'gradients.dart';
 part 'decoration.dart';
 part 'shadows.dart';
 part 'radius.dart';
-part 'text_theme_legacy.dart';
-
 
 class WorkExperienceData {
   final String company;
@@ -39,32 +34,40 @@ class WorkExperienceData {
   });
 }
 
-class EducationData {
-  final String degree;
-  final String institution;
-  final String duration;
-  final String? specialization;
+class HeroStatData {
+  final String value;
+  final String label;
+
+  HeroStatData({required this.value, required this.label});
+}
+
+class ServiceCardData {
+  final String title;
+  final String description;
   final IconData icon;
 
-  EducationData({
-    required this.degree,
-    required this.institution,
-    required this.duration,
-    this.specialization,
+  ServiceCardData({
+    required this.title,
+    required this.description,
     required this.icon,
   });
 }
 
-class AwardItemData {
+class TechCategoryData {
   final String title;
-  final IconData icon;
-  final Color iconColor;
-  final String? url;
+  final List<String> technologies;
 
-  AwardItemData({
+  TechCategoryData({required this.title, required this.technologies});
+}
+
+class ProcessStepData {
+  final String number;
+  final String title;
+  final String description;
+
+  ProcessStepData({
+    required this.number,
     required this.title,
-    required this.icon,
-    required this.iconColor,
-    this.url,
+    required this.description,
   });
 }

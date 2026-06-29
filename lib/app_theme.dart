@@ -3,121 +3,133 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:nimbus/values/values.dart';
 
 class AppTheme {
-  static const _lightFillColor = Colors.black;
+  static ThemeData lightThemeData = _buildTheme(Brightness.light);
+  static ThemeData darkThemeData = _buildTheme(Brightness.dark);
 
-  static final Color _lightFocusColor = Colors.black.withOpacity(0.12);
+  static ThemeData _buildTheme(Brightness brightness) {
+    final isDark = brightness == Brightness.dark;
 
-  static ThemeData lightThemeData =
-      themeData(lightColorScheme, _lightFocusColor);
+    final colorScheme = ColorScheme(
+      brightness: brightness,
+      primary: AppColors.primaryColor,
+      onPrimary: AppColors.darkBackground,
+      secondary: AppColors.accentViolet,
+      onSecondary: AppColors.white,
+      error: AppColors.red,
+      onError: AppColors.white,
+      surface: isDark ? AppColors.darkSurface : AppColors.white,
+      onSurface: isDark ? AppColors.white : AppColors.secondaryColor,
+      background: isDark ? AppColors.darkBackground : AppColors.accentColor,
+      onBackground: isDark ? AppColors.white : AppColors.secondaryColor,
+    );
 
-  static ThemeData themeData(ColorScheme colorScheme, Color focusColor) {
     return ThemeData(
+      useMaterial3: true,
+      brightness: brightness,
       colorScheme: colorScheme,
-      textTheme: _textTheme,
-      iconTheme: const IconThemeData(color: AppColors.white),
-      canvasColor: colorScheme.surface,
       scaffoldBackgroundColor: colorScheme.background,
+      canvasColor: colorScheme.surface,
+      dividerColor: isDark ? AppColors.darkBorder : AppColors.grey100,
       highlightColor: Colors.transparent,
+      splashColor: AppColors.primaryColor.withOpacity(0.12),
       visualDensity: VisualDensity.adaptivePlatformDensity,
-      focusColor: AppColors.primaryColor,
-      useMaterial3: false,
+      cardTheme: CardThemeData(
+        elevation: isDark ? 0 : 2,
+        color: isDark ? AppColors.darkCard : AppColors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(Sizes.RADIUS_12),
+          side: isDark
+              ? BorderSide(color: AppColors.darkBorder.withOpacity(0.6))
+              : BorderSide.none,
+        ),
+      ),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: AppColors.primaryColor,
+        foregroundColor: AppColors.darkBackground,
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(Sizes.RADIUS_12),
+        ),
+      ),
+      textTheme: _textTheme(isDark),
     );
   }
 
-  static final ColorScheme lightColorScheme = ColorScheme.light(
-    brightness: Brightness.light,
-    primary: AppColors.primaryColor,
-    secondary: AppColors.primaryColor,
-    background: Colors.white,
-    surface: const Color(0xFFFAFBFB),
-    onBackground: AppColors.primaryColor,
-    onSurface: const Color(0xFF241E30),
-  ).copyWith(
-    onPrimary: _lightFillColor,
-    onSecondary: const Color(0xFF322942),
-    error: _lightFillColor,
-    onError: _lightFillColor,
-  );
+  static TextTheme _textTheme(bool isDark) {
+    const bold = FontWeight.w700;
+    const semiBold = FontWeight.w600;
+    const regular = FontWeight.w400;
 
-  // static const _superBold = FontWeight.w900;
-  static const _bold = FontWeight.w700;
-  // static const _semiBold = FontWeight.w600;
-  // static const _medium = FontWeight.w500;
-  static const _regular = FontWeight.w400;
-  static const _light = FontWeight.w300;
+    final primaryText = isDark ? AppColors.white : AppColors.secondaryColor;
+    final bodyText = isDark ? AppColors.grey150 : AppColors.primaryText2;
+    final mutedText = isDark ? AppColors.grey250 : AppColors.primaryText1;
 
-  static final TextTheme _textTheme = TextTheme(
-    displayLarge: GoogleFonts.gloriaHallelujah(
-      fontSize: Sizes.TEXT_SIZE_96,
-      color: AppColors.black,
-      fontWeight: _bold,
-      fontStyle: FontStyle.normal,
-    ),
-    displayMedium: GoogleFonts.ibmPlexMono(
-      fontSize: Sizes.TEXT_SIZE_60,
-      color: AppColors.black,
-      fontWeight: _bold,
-      fontStyle: FontStyle.normal,
-    ),
-    displaySmall: GoogleFonts.ibmPlexMono(
-      fontSize: Sizes.TEXT_SIZE_48,
-      color: AppColors.black,
-      fontWeight: _bold,
-      fontStyle: FontStyle.normal,
-    ),
-    headlineMedium: GoogleFonts.ibmPlexMono(
-      fontSize: Sizes.TEXT_SIZE_34,
-      color: AppColors.black,
-      fontWeight: _bold,
-      fontStyle: FontStyle.normal,
-    ),
-    headlineSmall: GoogleFonts.ibmPlexMono(
-      fontSize: Sizes.TEXT_SIZE_24,
-      color: AppColors.black,
-      fontWeight: _bold,
-      fontStyle: FontStyle.normal,
-    ),
-    titleLarge: GoogleFonts.ibmPlexMono(
-      fontSize: Sizes.TEXT_SIZE_20,
-      color: AppColors.black,
-      fontWeight: _bold,
-      fontStyle: FontStyle.normal,
-    ),
-    titleMedium: GoogleFonts.ibmPlexMono(
-      fontSize: Sizes.TEXT_SIZE_18,
-      color: AppColors.black,
-      fontWeight: _bold,
-      fontStyle: FontStyle.normal,
-    ),
-    titleSmall: GoogleFonts.ibmPlexMono(
-      fontSize: Sizes.TEXT_SIZE_14,
-      color: AppColors.black,
-      fontWeight: _bold,
-      fontStyle: FontStyle.normal,
-    ),
-    bodyLarge: GoogleFonts.lato(
-      fontSize: Sizes.TEXT_SIZE_16,
-      color: AppColors.primaryText2,
-      fontWeight: _regular,
-      fontStyle: FontStyle.normal,
-    ),
-    bodyMedium: GoogleFonts.ibmPlexMono(
-      fontSize: Sizes.TEXT_SIZE_14,
-      color: AppColors.black,
-      fontWeight: _light,
-      fontStyle: FontStyle.normal,
-    ),
-    labelLarge: GoogleFonts.lato(
-      fontSize: Sizes.TEXT_SIZE_16,
-      color: AppColors.black,
-      fontStyle: FontStyle.normal,
-      fontWeight: _regular,
-    ),
-    bodySmall: GoogleFonts.ibmPlexMono(
-      fontSize: Sizes.TEXT_SIZE_12,
-      color: AppColors.primaryText1,
-      fontWeight: _regular,
-      fontStyle: FontStyle.normal,
-    ),
-  );
+    return TextTheme(
+      displayLarge: GoogleFonts.spaceGrotesk(
+        fontSize: Sizes.TEXT_SIZE_96,
+        color: primaryText,
+        fontWeight: bold,
+      ),
+      displayMedium: GoogleFonts.spaceGrotesk(
+        fontSize: Sizes.TEXT_SIZE_60,
+        color: primaryText,
+        fontWeight: bold,
+      ),
+      displaySmall: GoogleFonts.spaceGrotesk(
+        fontSize: Sizes.TEXT_SIZE_48,
+        color: primaryText,
+        fontWeight: bold,
+      ),
+      headlineMedium: GoogleFonts.spaceGrotesk(
+        fontSize: Sizes.TEXT_SIZE_34,
+        color: primaryText,
+        fontWeight: bold,
+      ),
+      headlineSmall: GoogleFonts.spaceGrotesk(
+        fontSize: Sizes.TEXT_SIZE_24,
+        color: primaryText,
+        fontWeight: bold,
+      ),
+      titleLarge: GoogleFonts.spaceGrotesk(
+        fontSize: Sizes.TEXT_SIZE_20,
+        color: primaryText,
+        fontWeight: semiBold,
+      ),
+      titleMedium: GoogleFonts.inter(
+        fontSize: Sizes.TEXT_SIZE_18,
+        color: primaryText,
+        fontWeight: semiBold,
+      ),
+      titleSmall: GoogleFonts.inter(
+        fontSize: Sizes.TEXT_SIZE_14,
+        color: primaryText,
+        fontWeight: semiBold,
+      ),
+      bodyLarge: GoogleFonts.inter(
+        fontSize: Sizes.TEXT_SIZE_16,
+        color: bodyText,
+        fontWeight: regular,
+        height: 1.7,
+      ),
+      bodyMedium: GoogleFonts.inter(
+        fontSize: Sizes.TEXT_SIZE_14,
+        color: bodyText,
+        fontWeight: regular,
+        height: 1.6,
+      ),
+      labelLarge: GoogleFonts.inter(
+        fontSize: Sizes.TEXT_SIZE_16,
+        color: primaryText,
+        fontWeight: semiBold,
+      ),
+      bodySmall: GoogleFonts.inter(
+        fontSize: Sizes.TEXT_SIZE_12,
+        color: mutedText,
+        fontWeight: regular,
+      ),
+    ).apply(
+      bodyColor: bodyText,
+      displayColor: primaryText,
+    );
+  }
 }

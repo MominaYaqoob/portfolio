@@ -1,259 +1,159 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:nimbus/presentation/layout/adaptive.dart';
-import 'package:nimbus/presentation/widgets/content_area.dart';
-import 'package:nimbus/presentation/widgets/nimbus_info_section.dart';
+import 'package:nimbus/presentation/widgets/page_section.dart';
+import 'package:nimbus/presentation/widgets/section_header.dart';
 import 'package:nimbus/presentation/widgets/spaces.dart';
 import 'package:nimbus/values/values.dart';
-import 'package:responsive_builder/responsive_builder.dart';
-import 'package:visibility_detector/visibility_detector.dart';
 
-class WorkExperienceSection extends StatefulWidget {
-  WorkExperienceSection({Key? key});
-
-  @override
-  _WorkExperienceSectionState createState() => _WorkExperienceSectionState();
-}
-
-class _WorkExperienceSectionState extends State<WorkExperienceSection>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _fadeAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 1000),
-      vsync: this,
-    );
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
-    );
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // Ensure content is visible on mobile even if VisibilityDetector doesn't fire immediately.
-    // Start the animation so users on small screens see the section.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        _controller.forward();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+class WorkExperienceSection extends StatelessWidget {
+  const WorkExperienceSection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = widthOfScreen(context) - (getSidePadding(context) * 2);
-    double contentAreaWidth = responsiveSize(
-      context,
-      screenWidth,
-      screenWidth * 0.5,
-      md: screenWidth * 0.5,
-    );
+    final textTheme = Theme.of(context).textTheme;
 
-    return VisibilityDetector(
-      key: Key('work-experience-section'),
-      onVisibilityChanged: (visibilityInfo) {
-        double visiblePercentage = visibilityInfo.visibleFraction * 100;
-        if (visiblePercentage > 30) {
-          _controller.forward();
-        }
-      },
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: getSidePadding(context)),
-        child: ResponsiveBuilder(
-          refinedBreakpoints: RefinedBreakpoints(),
-          builder: (context, sizingInformation) {
-            double screenWidth = sizingInformation.screenSize.width;
-            if (screenWidth <= 1024) {
-              return Column(
-                children: [
-                  ContentArea(
-                    width: screenWidth,
-                    child: _buildNimbusInfoSectionSm(),
-                  ),
-                  SpaceH40(),
-                  ContentArea(
-                    width: screenWidth,
-                    child: _buildExperienceList(),
-                  ),
-                ],
-              );
-            } else {
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ContentArea(
-                    width: contentAreaWidth,
-                    child: _buildNimbusInfoSectionLg(),
-                  ),
-                  ContentArea(
-                    width: contentAreaWidth,
-                    child: _buildExperienceList(),
-                  ),
-                ],
-              );
-            }
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNimbusInfoSectionSm() {
-    return NimbusInfoSection2(
-      sectionTitle: "work experience",
-      title1: "Professional",
-      title2: "Experience",
-      body: "Hands-on experience building modern, user-friendly mobile applications with Flutter. Working on Firebase integrations, REST APIs, and UI/UX improvements.",
-    );
-  }
-
-  Widget _buildNimbusInfoSectionLg() {
-    return NimbusInfoSection1(
-      sectionTitle: "work experience",
-      title1: "Professional",
-      title2: "Experience",
-      body: "Hands-on experience building modern, user-friendly mobile applications with Flutter. Working on Firebase integrations, REST APIs, and UI/UX improvements.",
-    );
-  }
-
-  Widget _buildExperienceList() {
-    return FadeTransition(
-      opacity: _fadeAnimation,
+    return PageSection(
+      backgroundColor: AppColors.darkSurface,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: Data.workExperienceData.asMap().entries.map((entry) {
-          int index = entry.key;
-          WorkExperienceData experience = entry.value;
-          return Padding(
-            padding: EdgeInsets.only(bottom: Sizes.PADDING_24),
-            child: _buildExperienceCard(experience, index),
-          );
-        }).toList(),
-      ),
-    );
-  }
-
-  Widget _buildExperienceCard(WorkExperienceData experience, int index) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    return Card(
-      elevation: 8,
-      shadowColor: AppColors.primaryColor.withOpacity(0.3),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(Sizes.RADIUS_12),
-        side: BorderSide(
-          color: AppColors.primaryColor.withOpacity(0.1),
-          width: 1,
-        ),
-      ),
-      child: Container(
-        padding: EdgeInsets.all(Sizes.PADDING_24),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(Sizes.RADIUS_12),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppColors.white,
-              AppColors.white.withOpacity(0.95),
-            ],
+        children: [
+          const SectionHeader(
+            label: StringConst.EXPERIENCE_LABEL,
+            title: StringConst.EXPERIENCE_TITLE,
           ),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                color: AppColors.primaryColor,
-                borderRadius: BorderRadius.circular(Sizes.RADIUS_8),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primaryColor.withOpacity(0.3),
-                    blurRadius: 8,
-                    offset: Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Icon(
-                experience.icon,
-                color: AppColors.white,
-                size: Sizes.ICON_SIZE_30,
-              ),
+          SpaceH36(),
+          ...Data.workExperienceData.map(
+            (exp) => Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: _ExperienceCard(experience: exp, textTheme: textTheme),
             ),
-            SpaceW16(),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    experience.position,
-                    style: textTheme.headline6?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.black,
-                    ),
-                  ),
-                  SpaceH8(),
-                  Text(
-                    experience.company,
-                    style: textTheme.subtitle1?.copyWith(
-                      color: AppColors.primaryColor,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SpaceH8(),
-                  Text(
-                    experience.duration,
-                    style: textTheme.bodyText2?.copyWith(
-                      color: AppColors.grey300,
-                    ),
-                  ),
-                  SpaceH16(),
-                  ...experience.responsibilities.map((responsibility) {
-                    return Padding(
-                      padding: EdgeInsets.only(bottom: Sizes.PADDING_8),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            margin: EdgeInsets.only(top: 6, right: 12),
-                            width: 6,
-                            height: 6,
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryColor,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          Expanded(
-                            child: Text(
-                              responsibility,
-                              style: textTheme.bodyText2?.copyWith(
-                                color: AppColors.black400,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }).toList(),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 }
 
+class _ExperienceCard extends StatelessWidget {
+  const _ExperienceCard({
+    required this.experience,
+    required this.textTheme,
+  });
+
+  final WorkExperienceData experience;
+  final TextTheme textTheme;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(28),
+      decoration: BoxDecoration(
+        color: AppColors.darkCard,
+        borderRadius: BorderRadius.circular(Sizes.RADIUS_12),
+        border: Border.all(color: AppColors.darkBorder),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryColor.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(Sizes.RADIUS_8),
+                  border: Border.all(color: AppColors.primaryColor.withOpacity(0.3)),
+                ),
+                child: Icon(experience.icon, color: AppColors.primaryColor, size: 22),
+              ),
+              SpaceW16(),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      experience.position,
+                      style: textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      experience.company,
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: AppColors.primaryColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      experience.duration,
+                      style: textTheme.bodySmall?.copyWith(color: AppColors.grey250),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SpaceH20(),
+          ...experience.responsibilities.map(
+            (item) => Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('•  ', style: TextStyle(color: AppColors.primaryColor)),
+                  Expanded(
+                    child: Text(
+                      item,
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: AppColors.grey250,
+                        height: 1.6,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SpaceH12(),
+          Wrap(
+            spacing: 8,
+            children: const [
+              _TagChip('Flutter'),
+              _TagChip('Firebase'),
+              _TagChip('REST APIs'),
+              _TagChip('UI/UX'),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TagChip extends StatelessWidget {
+  const _TagChip(this.label);
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: AppColors.primaryColor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: AppColors.primaryColor.withOpacity(0.2)),
+      ),
+      child: Text(
+        label,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: AppColors.primaryColor,
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
+      ),
+    );
+  }
+}

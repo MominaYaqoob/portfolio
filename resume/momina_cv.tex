@@ -1,0 +1,172 @@
+% ============================================================
+% Momina Yaqoob — CV (based on Momina_CV-2.pdf)
+% Overleaf: paste as main.tex | Compiler: pdfLaTeX
+% ============================================================
+
+\documentclass[10pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=0.55in, top=0.45in, bottom=0.5in]{geometry}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{tabularx}
+\usepackage{fontawesome5}
+\usepackage[hidelinks]{hyperref}
+\usepackage{tikz}
+\usepackage{microtype}
+
+\definecolor{gold}{HTML}{F5C242}
+\definecolor{darkbg}{HTML}{141419}
+\definecolor{textgray}{HTML}{71717A}
+\definecolor{lightgray}{HTML}{E4E4E7}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+\pagestyle{empty}
+
+\titleformat{\section}
+  {\color{darkbg}\normalsize\bfseries\uppercase}
+  {}{0em}{}
+  [\vspace{-3pt}{\color{gold}\titlerule[1pt]}]
+\titlespacing*{\section}{0pt}{10pt}{5pt}
+
+\newcommand{\role}[4]{%
+  \vspace{2pt}
+  \noindent
+  \begin{tabularx}{\textwidth}{@{}X r@{}}
+    \textbf{#1} & \textcolor{textgray}{\footnotesize #2} \\
+    \textit{\color{textgray}\footnotesize #3} & \textit{\color{textgray}\footnotesize #4} \\
+  \end{tabularx}
+  \vspace{2pt}
+}
+
+\newcommand{\project}[3]{%
+  \vspace{4pt}
+  \noindent\textbf{#1}\hfill\footnotesize\href{#2}{\color{gold}#3}\\[-1pt]
+}
+
+\newcommand{\skillitem}[2]{\item \textbf{#1:} #2}
+
+\begin{document}
+
+% ==================== HEADER ====================
+\noindent
+\colorbox{darkbg}{%
+  \begin{minipage}{\dimexpr\textwidth-2\fboxsep\relax}
+    \vspace{12pt}
+    \begin{center}
+      {\fontsize{24}{28}\selectfont\bfseries\color{white} MOMINA YAQOOB}\\[5pt]
+      {\fontsize{12}{15}\selectfont\color{gold} Flutter Developer \textemdash\ Mobile App Engineer}\\[8pt]
+      {\footnotesize\color{lightgray}
+        \faIcon{phone}\ \href{tel:+923205352136}{+92 320-5352136} \enspace\textbar\enspace
+        \faIcon{envelope}\ \href{mailto:mominayaqoob00@gmail.com}{mominayaqoob00@gmail.com} \enspace\textbar\enspace
+        \faIcon{map-marker-alt}\ Rawalpindi, Pakistan
+      }\\[5pt]
+      {\footnotesize\color{lightgray}
+        \faIcon{github}\ \href{https://github.com/momina-yaqoob}{GitHub} \enspace\textbar\enspace
+        \faIcon{linkedin}\ \href{https://www.linkedin.com/in/momina-yaqoob}{LinkedIn} \enspace\textbar\enspace
+        \faIcon{globe}\ \href{https://mominayaqoob-portfolio-website.web.app}{Portfolio}
+      }
+    \end{center}
+    \vspace{12pt}
+  \end{minipage}%
+}
+
+\vspace{8pt}
+
+% ==================== SUMMARY ====================
+\section{Professional Summary}
+\footnotesize
+Flutter Developer with strong hands-on experience in building modern, user-friendly, and scalable mobile
+applications. Skilled in Flutter, Dart, Firebase, REST API integration, and responsive UI/UX design. Proven
+expertise in delivering real-world solutions for e-commerce, assistive technology, and delivery platforms. Adept
+at clean architecture, performance optimization, and building feature-rich mobile experiences.
+
+% ==================== SKILLS ====================
+\section{Technical Skills}
+\footnotesize
+\begin{itemize}[leftmargin=1.1em, itemsep=1pt, topsep=2pt, parsep=0pt]
+  \skillitem{Mobile Development}{Flutter (Provider, Riverpod), Dart}
+  \skillitem{Backend \& Services}{Firebase (Authentication, Firestore, RTDB, Cloud Messaging), Supabase}
+  \skillitem{APIs \& Communication}{REST APIs, GraphQL, WebSockets}
+  \skillitem{Databases \& Storage}{Hive, SQLite, Sqflite, SharedPreferences, MySQL, PostgreSQL}
+  \skillitem{CI/CD \& DevOps}{Git, GitHub Actions, Codemagic}
+  \skillitem{Testing}{Unit, Widget, Integration Testing}
+  \skillitem{Payments \& Fintech}{Stripe, PayPal, App \& Play Store Payment Methods}
+  \skillitem{Ads Integration}{Google AdMob, Google AdSense}
+  \skillitem{Core Concepts}{Clean Architecture, MVVM, MVC, MCCM, Navigation 2.0, OOP, Localization, Responsive UI, Google Maps API}
+  \skillitem{Programming Languages}{Dart, C++, Java, Python}
+  \skillitem{Tools \& Platforms}{Android Studio, VS Code, Figma, GitHub}
+  \skillitem{Other Skills}{Technical Content Creation, Communication, Team Collaboration, Critical Thinking}
+\end{itemize}
+
+% ==================== EXPERIENCE ====================
+\section{Professional Experience}
+
+\role{Mobile App Development Intern}{17 Oct 2025 -- 17 Jan 2026}{QMH Technologies, Rawalpindi \textbar\ Mobile App Development}{}
+\footnotesize
+\begin{itemize}[leftmargin=1.1em, itemsep=1pt, topsep=2pt, parsep=0pt]
+  \item Developed mobile applications using Flutter with Firebase and REST API integrations
+  \item Improved UI/UX for multiple production applications
+  \item Implemented authentication systems, push notifications, and real-time database features
+  \item Collaborated with team to deliver functional modules and meet project deadlines
+  \item Participated in code reviews and contributed to maintaining code quality standards
+\end{itemize}
+
+% ==================== EDUCATION ====================
+\section{Education}
+
+\role{BS Software Engineering}{2021 -- 2025}{University of Gujrat, Pakistan}{Grade: B+}
+\role{FSC (ICS)}{2019 -- 2021}{F.G Inter College, Mangla Cantt}{Grade: A+}
+\role{Matric (Computer Science)}{2017 -- 2019}{WAPDA Model High School, Mangla}{Grade: A}
+
+% ==================== PROJECTS ====================
+\section{Key Projects}
+
+\project{Stick4Guide -- Assistive App for Blind Users}{https://github.com/momina-yaqoob}{GitHub}
+\footnotesize\textit{Flutter, Dart, Firebase, Google Maps, FCM}\\[-2pt]
+FYP: Accessibility-focused app for blind users with SOS system, geofencing, real-time location sharing, and
+Firebase Realtime Database. \textbf{Achievement: 3rd Position in Batch.}
+
+\project{SwiftCart eCommerce App}{https://github.com/momina-yaqoob}{GitHub}
+\footnotesize\textit{Flutter, Dart, Firebase, REST APIs}\\[-2pt]
+Designed and implemented complete product listing, shopping cart with persistent storage, secure checkout
+with payment gateway, and Firebase authentication.
+
+\project{PELICKAN Driver App}{https://github.com/momina-yaqoob}{GitHub}
+\footnotesize\textit{Figma, Flutter, Dart, Firebase}\\[-2pt]
+Created complete UI/UX workflows and high-fidelity prototypes; implemented notification system for real-time
+ride updates and earnings tracking.
+
+\project{CovidTrackr -- COVID-19 Global Tracker}{https://github.com/momina-yaqoob}{GitHub}
+\footnotesize\textit{Flutter, Dart, REST APIs}\\[-2pt]
+Interactive global COVID-19 data visualization with REST API integration, searchable country list, and
+detailed statistics.
+
+\project{Cloud Notes}{https://github.com/momina-yaqoob}{GitHub}
+\footnotesize\textit{Flutter, Dart, Firebase}\\[-2pt]
+Cloud-based note-taking application with real-time sync and secure user authentication.
+
+% ==================== CERTIFICATES ====================
+\section{Certificates \& Achievements}
+\footnotesize\textcolor{textgray}{Certificates Repository}
+\begin{itemize}[leftmargin=1.1em, itemsep=1pt, topsep=3pt, parsep=0pt]
+  \item \textbf{Final Year Project (FYP) Certification -- Stick4Guide: Assistive App for Blind Users}
+  \begin{itemize}[leftmargin=1.2em, itemsep=0pt, topsep=1pt]
+    \item Group Certificate -- Project Development \& Implementation
+    \item Individual Certificate -- Project Participation \& Contribution
+    \item \textbf{Achievement: 3rd Position in Batch}
+  \end{itemize}
+\end{itemize}
+
+\vfill
+\begin{center}
+\footnotesize\color{textgray}
+Momina Yaqoob \textbar\ Flutter Developer \textbar\
+\href{https://mominayaqoob-portfolio-website.web.app}{mominayaqoob-portfolio-website.web.app}
+\end{center}
+
+\end{document}

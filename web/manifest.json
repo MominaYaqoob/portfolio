@@ -1,11 +1,11 @@
 {
-    "name": "portfolio_website",
-    "short_name": "portfolio_website",
+    "name": "Momina Yaqoob Portfolio",
+    "short_name": "Momina",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#09090B",
+    "theme_color": "#F5C242",
+    "description": "Flutter Developer portfolio — mobile apps, eCommerce, assistive technology.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

@@ -1,38 +1,48 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:nimbus/presentation/widgets/app_icon.dart';
 import 'package:nimbus/presentation/layout/adaptive.dart';
+import 'package:nimbus/presentation/widgets/project_preview.dart';
 import 'package:nimbus/presentation/widgets/spaces.dart';
 import 'package:nimbus/utils/functions.dart';
 import 'package:nimbus/values/values.dart';
 import 'package:url_launcher/link.dart';
 
-import 'animated_indicator.dart';
-
 class ProjectData {
-  final String projectCoverUrl;
   final String title;
   final String category;
+  final String description;
+  final List<String> techStack;
+  final ProjectPreviewType previewType;
   final double width;
   final double height;
   final double mobileWidth;
   final double mobileHeight;
   final bool isLive;
+  final bool isComingSoon;
   final String? githubUrl;
   final String? playStoreUrl;
   final String? appStoreUrl;
+  final String? liveUrl;
 
   ProjectData({
-    required this.projectCoverUrl,
     required this.title,
     required this.category,
+    required this.description,
+    required this.techStack,
+    required this.previewType,
     required this.width,
     this.mobileHeight = 0.5,
     this.mobileWidth = 1.0,
     this.height = 0.4,
     this.isLive = false,
+    this.isComingSoon = false,
     this.githubUrl,
     this.playStoreUrl,
     this.appStoreUrl,
+    this.liveUrl,
   });
 }
 
@@ -41,340 +51,323 @@ class ProjectItem extends StatefulWidget {
     Key? key,
     required this.title,
     required this.subtitle,
-    required this.imageUrl,
+    required this.description,
+    required this.techStack,
+    required this.previewType,
     required this.width,
     required this.height,
     this.bannerHeight,
     this.titleStyle,
     this.subtitleStyle,
-    this.textColor = AppColors.white,
-    this.bannerColor,
     this.isLive = false,
+    this.isComingSoon = false,
     this.githubUrl,
     this.playStoreUrl,
     this.appStoreUrl,
+    this.liveUrl,
   }) : super(key: key);
 
   final String title;
   final String subtitle;
+  final String description;
+  final List<String> techStack;
+  final ProjectPreviewType previewType;
   final TextStyle? titleStyle;
   final TextStyle? subtitleStyle;
-  final String imageUrl;
-  final Color? bannerColor;
-  final Color textColor;
   final double width;
   final double height;
   final double? bannerHeight;
   final bool isLive;
+  final bool isComingSoon;
   final String? githubUrl;
   final String? playStoreUrl;
   final String? appStoreUrl;
+  final String? liveUrl;
 
   @override
-  _ProjectItemState createState() => _ProjectItemState();
+  State<ProjectItem> createState() => _ProjectItemState();
 }
 
 class _ProjectItemState extends State<ProjectItem>
-    with TickerProviderStateMixin {
-  late AnimationController _slideFadeController;
-  late AnimationController _indicatorController;
-  late Animation<double> _indicatorAnimation;
-  late Animation<double> _fadeInAnimation;
-  late Animation<Offset> _slideAnimation;
+    with SingleTickerProviderStateMixin {
+  late AnimationController _hoverController;
   bool _hovering = false;
 
   @override
   void initState() {
     super.initState();
-    _indicatorController = AnimationController(
-      duration: const Duration(milliseconds: 800),
+    _hoverController = AnimationController(
+      duration: const Duration(milliseconds: 350),
       vsync: this,
-    );
-    _slideFadeController = AnimationController(
-      duration: const Duration(milliseconds: 400),
-      vsync: this,
-    );
-    _indicatorAnimation = Tween(
-      begin: 100.0,
-      end: 0.0,
-    ).animate(
-      CurvedAnimation(
-        parent: _indicatorController,
-        curve: Curves.easeIn,
-      ),
-    );
-    _fadeInAnimation = Tween(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _slideFadeController,
-        curve: Curves.easeIn,
-      ),
-    );
-    _slideAnimation =
-        Tween<Offset>(begin: Offset(0, -0.1), end: Offset(0, 0)).animate(
-      CurvedAnimation(
-        parent: _slideFadeController,
-        curve: Curves.easeIn,
-      ),
     );
   }
 
   @override
   void dispose() {
-    _slideFadeController.dispose();
-    _indicatorController.dispose();
+    _hoverController.dispose();
     super.dispose();
+  }
+
+  void _setHover(bool hovering) {
+    if (!isDisplayDesktop(context)) return;
+    setState(() => _hovering = hovering);
+    if (hovering) {
+      _hoverController.forward();
+    } else {
+      _hoverController.reverse();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    bool isMobile = !isDisplayDesktop(context);
-    
-    // On mobile, always show the cover (icons need to be visible)
-    if (isMobile && _fadeInAnimation.value == 0.0) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          _slideFadeController.value = 1.0;
-          _indicatorController.value = 1.0;
-        }
-      });
-    }
-    
+    final isMobile = !isDisplayDesktop(context);
+    final showOverlay = isMobile || _hovering || widget.isComingSoon;
+
     return MouseRegion(
-      onEnter: isMobile ? null : (e) => _mouseEnter(true),
-      onExit: isMobile ? null : (e) => _mouseEnter(false),
-      child: Container(
-        child: Stack(
-          children: [
-            Image.asset(
-              widget.imageUrl,
-              width: widget.width,
-              height: widget.height,
-              fit: BoxFit.fill,
+      onEnter: (_) => _setHover(true),
+      onExit: (_) => _setHover(false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        width: widget.width,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(Sizes.RADIUS_12),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primaryColor.withOpacity(_hovering ? 0.25 : 0.08),
+              blurRadius: _hovering ? 24 : 12,
+              offset: Offset(0, _hovering ? 12 : 6),
             ),
-            Positioned(
-              bottom: 0,
-              child: isMobile 
-                ? ProjectCover(
-                    animation: _indicatorAnimation,
-                    color: widget.bannerColor ?? Colors.black.withOpacity(0.8),
-                    width: widget.width,
-                    height: widget.bannerHeight ?? widget.height / 3,
-                    title: widget.title,
-                    subtitle: widget.subtitle,
-                    titleStyle: widget.titleStyle,
-                    subtitleStyle: widget.subtitleStyle,
-                    isHover: true,
-                    isLive: widget.isLive,
-                    githubUrl: widget.githubUrl,
-                    playStoreUrl: widget.playStoreUrl,
-                    appStoreUrl: widget.appStoreUrl,
-                  )
-                : FadeTransition(
-                    opacity: _fadeInAnimation,
-                    child: SlideTransition(
-                      position: _slideAnimation,
-                      child: ProjectCover(
-                        animation: _indicatorAnimation,
-                        color: widget.bannerColor ?? Colors.black.withOpacity(0.8),
-                        width: widget.width,
-                        height: widget.bannerHeight ?? widget.height / 3,
-                        title: widget.title,
-                        subtitle: widget.subtitle,
-                        titleStyle: widget.titleStyle,
-                        subtitleStyle: widget.subtitleStyle,
-                        isHover: _hovering,
-                        isLive: widget.isLive,
-                        githubUrl: widget.githubUrl,
-                        playStoreUrl: widget.playStoreUrl,
-                        appStoreUrl: widget.appStoreUrl,
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(Sizes.RADIUS_12),
+          child: Stack(
+            children: [
+              ProjectPreview(
+                type: widget.previewType,
+                width: widget.width,
+                height: widget.height,
+              ),
+              AnimatedOpacity(
+                opacity: showOverlay ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 300),
+                child: _ProjectOverlay(
+                  width: widget.width,
+                  height: widget.height,
+                  title: widget.title,
+                  subtitle: widget.subtitle,
+                  description: widget.description,
+                  techStack: widget.techStack,
+                  titleStyle: widget.titleStyle,
+                  subtitleStyle: widget.subtitleStyle,
+                  isLive: widget.isLive,
+                  isComingSoon: widget.isComingSoon,
+                  githubUrl: widget.githubUrl,
+                  playStoreUrl: widget.playStoreUrl,
+                  appStoreUrl: widget.appStoreUrl,
+                  liveUrl: widget.liveUrl,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ProjectOverlay extends StatelessWidget {
+  const _ProjectOverlay({
+    required this.width,
+    required this.height,
+    required this.title,
+    required this.subtitle,
+    required this.description,
+    required this.techStack,
+    this.titleStyle,
+    this.subtitleStyle,
+    this.isLive = false,
+    this.isComingSoon = false,
+    this.githubUrl,
+    this.playStoreUrl,
+    this.appStoreUrl,
+    this.liveUrl,
+  });
+
+  final double width;
+  final double height;
+  final String title;
+  final String subtitle;
+  final String description;
+  final List<String> techStack;
+  final TextStyle? titleStyle;
+  final TextStyle? subtitleStyle;
+  final bool isLive;
+  final bool isComingSoon;
+  final String? githubUrl;
+  final String? playStoreUrl;
+  final String? appStoreUrl;
+  final String? liveUrl;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return BackdropFilter(
+      filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+      child: Container(
+        width: width,
+        height: height,
+        padding: const EdgeInsets.all(Sizes.PADDING_16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.black.withOpacity(0.55),
+              Colors.black.withOpacity(0.82),
+            ],
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              subtitle.toUpperCase(),
+              style: textTheme.bodySmall?.copyWith(
+                color: AppColors.primaryColor,
+                letterSpacing: 1.2,
+                fontWeight: FontWeight.w600,
+                fontSize: 11,
+              ),
+            ),
+            SpaceH8(),
+            Text(
+              title,
+              style: titleStyle ??
+                  textTheme.titleLarge?.copyWith(
+                    color: AppColors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            SpaceH8(),
+            Expanded(
+              child: Text(
+                description,
+                style: subtitleStyle ??
+                    textTheme.bodyMedium?.copyWith(
+                      color: Colors.white.withOpacity(0.85),
+                      fontSize: 13,
+                      height: 1.5,
+                    ),
+                maxLines: 4,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: techStack
+                  .map(
+                    (tech) => Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.2),
+                        ),
+                      ),
+                      child: Text(
+                        tech,
+                        style: textTheme.bodySmall?.copyWith(
+                          color: Colors.white.withOpacity(0.9),
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
-                  ),
+                  )
+                  .toList(),
             ),
+            SpaceH12(),
+            _buildIconLinks(context),
           ],
         ),
       ),
     );
   }
 
-  void _mouseEnter(bool hovering) {
-    if (!isDisplayDesktop(context)) return; // Only handle hover on desktop
-    
-    setState(() {
-      _hovering = hovering;
-    });
-    if (_hovering) {
-      _slideFadeController.forward();
-      _indicatorController.forward();
-    } else {
-      _slideFadeController.reverse();
-      _indicatorController.reset();
-    }
-  }
-}
-
-class ProjectCover extends StatelessWidget {
-  const ProjectCover({
-    Key? key,
-    required this.width,
-    required this.height,
-    required this.title,
-    required this.subtitle,
-    required this.animation,
-    this.indicatorColor = AppColors.white,
-    this.color,
-    this.subtitleStyle,
-    this.titleStyle,
-    this.isHover = false,
-    this.isLive = false,
-    this.githubUrl,
-    this.playStoreUrl,
-    this.appStoreUrl,
-  }) : super(key: key);
-
-  final String title;
-  final String subtitle;
-  final double width;
-  final double height;
-  final Color? color;
-  final Color indicatorColor;
-  final TextStyle? titleStyle;
-  final TextStyle? subtitleStyle;
-
-  final Animation<double> animation;
-
-  final bool isHover;
-  final bool isLive;
-  final String? githubUrl;
-  final String? playStoreUrl;
-  final String? appStoreUrl;
-  @override
-  Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    return Container(
-      width: width,
-      height: height,
-      color: color ?? Colors.black.withOpacity(0.8),
-      padding: EdgeInsets.symmetric(horizontal: Sizes.PADDING_16, vertical: Sizes.PADDING_12),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // AnimatedHoverIndicator2(
-          //   animation: animation,
-          //   indicatorColor: indicatorColor,
-          // ),
-          SpaceW16(),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Flexible(
-                  child: Text(
-                    title,
-                    style: titleStyle ??
-                        textTheme.headline6?.copyWith(
-                          color: AppColors.white,
-                        ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                SpaceH8(),
-                Row(
-                  children: [
-                    Flexible(
-                      child: Text(
-                        subtitle,
-                        style: subtitleStyle ??
-                            textTheme.subtitle2?.copyWith(
-                              color: AppColors.white,
-                              fontSize: Sizes.TEXT_SIZE_16,
-                            ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    if ((githubUrl != null && githubUrl!.isNotEmpty) || 
-                        (playStoreUrl != null && playStoreUrl!.isNotEmpty) ||
-                        (appStoreUrl != null && appStoreUrl!.isNotEmpty)) ...[
-                      SpaceW8(),
-                      _buildIconLinks(context),
-                    ],
-                  ],
-                ),
-              ],
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
   Widget _buildIconLinks(BuildContext context) {
-    List<Widget> icons = [];
-    
-    // Always show GitHub if available
+    if (isComingSoon) {
+      return Text(
+        'In Progress',
+        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: AppColors.accentCyan,
+              fontWeight: FontWeight.w700,
+            ),
+      );
+    }
+
+    final icons = <Widget>[];
+
     if (githubUrl != null && githubUrl!.isNotEmpty) {
-      icons.add(_buildIconButton(
-        context,
-        FontAwesomeIcons.github,
-        githubUrl!,
-        'GitHub',
+      icons.add(_ProjectIconButton(
+        icon: FontAwesomeIcons.github,
+        url: githubUrl!,
+        tooltip: 'View on GitHub',
       ));
     }
-    
-    // For live projects, also show Play Store and App Store
+
+    if (liveUrl != null && liveUrl!.isNotEmpty) {
+      icons.add(_ProjectIconButton(
+        icon: FontAwesomeIcons.externalLinkAlt,
+        url: liveUrl!,
+        tooltip: 'View Live',
+      ));
+    }
+
     if (isLive) {
       if (playStoreUrl != null && playStoreUrl!.isNotEmpty) {
-        icons.add(_buildIconButton(
-          context,
-          FontAwesomeIcons.googlePlay,
-          playStoreUrl!,
-          'Play Store',
+        icons.add(_ProjectIconButton(
+          icon: FontAwesomeIcons.googlePlay,
+          url: playStoreUrl!,
+          tooltip: 'Play Store',
         ));
       }
-      
       if (appStoreUrl != null && appStoreUrl!.isNotEmpty) {
-        icons.add(_buildIconButton(
-          context,
-          FontAwesomeIcons.appStore,
-          appStoreUrl!,
-          'App Store',
+        icons.add(_ProjectIconButton(
+          icon: FontAwesomeIcons.appStore,
+          url: appStoreUrl!,
+          tooltip: 'App Store',
         ));
       }
     }
-    
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: icons,
-    );
-  }
 
-  Widget _buildIconButton(BuildContext context, IconData icon, String url, String tooltip) {
-    return _ProjectIconButton(
-      icon: icon,
-      url: url,
-      tooltip: tooltip,
-    );
+    if (icons.isEmpty) return const SizedBox.shrink();
+
+    return Row(mainAxisSize: MainAxisSize.min, children: icons);
   }
 }
 
 class _ProjectIconButton extends StatefulWidget {
-  final IconData icon;
-  final String url;
-  final String tooltip;
-
   const _ProjectIconButton({
-    Key? key,
     required this.icon,
     required this.url,
     required this.tooltip,
-  }) : super(key: key);
+  });
+
+  final FaIconData icon;
+  final String url;
+  final String tooltip;
 
   @override
-  _ProjectIconButtonState createState() => _ProjectIconButtonState();
+  State<_ProjectIconButton> createState() => _ProjectIconButtonState();
 }
 
 class _ProjectIconButtonState extends State<_ProjectIconButton> {
@@ -394,23 +387,26 @@ class _ProjectIconButtonState extends State<_ProjectIconButton> {
           builder: (context, followLink) {
             return GestureDetector(
               onTap: followLink,
-                child: AnimatedContainer(
-                duration: Duration(milliseconds: 200),
-                margin: EdgeInsets.only(left: responsiveSize(context, Sizes.PADDING_4, Sizes.PADDING_8)),
-                padding: EdgeInsets.all(responsiveSize(context, Sizes.PADDING_4, Sizes.PADDING_6)),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                margin: EdgeInsets.only(
+                  right: responsiveSize(context, Sizes.PADDING_4, Sizes.PADDING_8),
+                ),
+                padding: EdgeInsets.all(
+                  responsiveSize(context, Sizes.PADDING_6, Sizes.PADDING_8),
+                ),
                 decoration: BoxDecoration(
-                  color: _isHovering 
-                      ? Colors.white.withOpacity(0.2)
-                      : Colors.white.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(Sizes.RADIUS_4),
+                  color: _isHovering
+                      ? AppColors.primaryColor.withOpacity(0.4)
+                      : Colors.white.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(Sizes.RADIUS_8),
                   border: Border.all(
                     color: _isHovering
-                        ? Colors.white.withOpacity(0.4)
-                        : Colors.white.withOpacity(0.2),
-                    width: 1,
+                        ? AppColors.primaryColor.withOpacity(0.6)
+                        : Colors.white.withOpacity(0.25),
                   ),
                 ),
-                child: Icon(
+                child: FaIcon(
                   widget.icon,
                   size: responsiveSize(context, Sizes.TEXT_SIZE_14, Sizes.TEXT_SIZE_16),
                   color: AppColors.white,

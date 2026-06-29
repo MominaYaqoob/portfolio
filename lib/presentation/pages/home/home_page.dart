@@ -1,31 +1,31 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:nimbus/presentation/widgets/app_icon.dart';
 import 'package:nimbus/presentation/layout/adaptive.dart';
 import 'package:nimbus/presentation/pages/home/sections/about_me_section.dart';
-import 'package:nimbus/presentation/pages/home/sections/awards_section.dart';
 import 'package:nimbus/presentation/pages/home/sections/footer_section.dart';
 import 'package:nimbus/presentation/pages/home/sections/header_section/header_section.dart';
-import 'package:nimbus/presentation/pages/home/sections/nav_section/nav_section_mobile.dart';
-import 'package:nimbus/presentation/pages/home/sections/nav_section/nav_section_web.dart';
+import 'package:nimbus/presentation/pages/home/sections/process_section.dart';
 import 'package:nimbus/presentation/pages/home/sections/projects_section.dart';
-import 'package:nimbus/presentation/pages/home/sections/skills_section.dart';
-import 'package:nimbus/presentation/pages/home/sections/statistics_section.dart';
+import 'package:nimbus/presentation/pages/home/sections/services_section.dart';
+import 'package:nimbus/presentation/pages/home/sections/tech_stack_section.dart';
 import 'package:nimbus/presentation/pages/home/sections/work_experience_section.dart';
-import 'package:nimbus/presentation/pages/home/sections/education_section.dart';
-import 'package:nimbus/presentation/widgets/app_drawer.dart';
+import 'package:nimbus/presentation/widgets/floating_dock_nav.dart';
 import 'package:nimbus/presentation/widgets/floating_whatsapp_button.dart';
-import 'package:nimbus/presentation/widgets/nav_item.dart';
-import 'package:nimbus/presentation/widgets/spaces.dart';
+import 'package:nimbus/presentation/widgets/section_nav_data.dart';
 import 'package:nimbus/utils/functions.dart';
 import 'package:nimbus/values/values.dart';
-import 'package:responsive_builder/responsive_builder.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 import '../../widgets/floating_gmail_button.dart';
 
+@RoutePage()
 class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
   @override
-  _HomePageState createState() => _HomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage>
@@ -38,20 +38,35 @@ class _HomePageState extends State<HomePage>
     parent: _controller,
     curve: Curves.easeInOut,
   );
-  // bool isFabVisible = false;
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
-
+  final GlobalKey _contactKey = GlobalKey();
   final ScrollController _scrollController = ScrollController();
+  int _activeDockIndex = 0;
 
-  final List<NavItemData> navItems = [
-    NavItemData(name: StringConst.HOME, key: GlobalKey(), isSelected: true),
-    NavItemData(name: StringConst.ABOUT, key: GlobalKey()),
-    NavItemData(name: StringConst.SKILLS, key: GlobalKey()),
-    NavItemData(name: StringConst.PROJECTS, key: GlobalKey()),
-    NavItemData(name: StringConst.WORK_EXPERIENCE, key: GlobalKey()),
-    NavItemData(name: StringConst.EDUCATION, key: GlobalKey()),
-    NavItemData(name: StringConst.AWARDS, key: GlobalKey()),
+  late final List<SectionNavData> navItems = [
+    SectionNavData(name: StringConst.HOME, key: GlobalKey(), isSelected: true),
+    SectionNavData(name: StringConst.ABOUT, key: GlobalKey()),
+    SectionNavData(name: StringConst.SERVICES, key: GlobalKey()),
+    SectionNavData(name: StringConst.PROJECTS, key: GlobalKey()),
+    SectionNavData(name: StringConst.WORK_EXPERIENCE, key: GlobalKey()),
+    SectionNavData(name: StringConst.CONTACT, key: _contactKey),
   ];
+
+  void _scrollToHome() {
+    scrollToSection(navItems[0].key.currentContext!);
+  }
+
+  void _scrollToProjects() {
+    scrollToSection(navItems[3].key.currentContext!);
+  }
+
+  void _scrollToIndex(int index) {
+    if (index >= navItems.length) return;
+    final sectionContext = navItems[index].key.currentContext;
+    if (sectionContext != null) {
+      setState(() => _activeDockIndex = index);
+      scrollToSection(sectionContext);
+    }
+  }
 
   @override
   void dispose() {
@@ -72,165 +87,88 @@ class _HomePageState extends State<HomePage>
 
   @override
   Widget build(BuildContext context) {
-    double screenHeight = heightOfScreen(context);
-    double spacerHeight = screenHeight * 0.10;
-
     return Stack(
       children: [
         Scaffold(
-          key: _scaffoldKey,
-          drawer: ResponsiveBuilder(
-            refinedBreakpoints: RefinedBreakpoints(),
-            builder: (context, sizingInformation) {
-              double screenWidth = sizingInformation.screenSize.width;
-              if (screenWidth < RefinedBreakpoints().desktopSmall) {
-                return AppDrawer(
-                  menuList: navItems,
-                );
-              } else {
-                return Container();
-              }
-            },
-          ),
+          backgroundColor: AppColors.darkBackground,
           floatingActionButton: ScaleTransition(
             scale: _animation,
             child: FloatingActionButton(
-              onPressed: () {
-                // Scroll to header section
-                scrollToSection(navItems[0].key.currentContext!);
-              },
-              child: Icon(
-                FontAwesomeIcons.arrowUp,
+              backgroundColor: AppColors.primaryColor,
+              foregroundColor: AppColors.darkBackground,
+              onPressed: _scrollToHome,
+              child: const AppIcon(
+                AppIconData.fa(FontAwesomeIcons.arrowUp),
                 size: Sizes.ICON_SIZE_18,
-                color: AppColors.white,
+                color: AppColors.darkBackground,
               ),
             ),
           ),
-          body: Column(
-            children: [
-              ResponsiveBuilder(
-                refinedBreakpoints: RefinedBreakpoints(),
-                builder: (context, sizingInformation) {
-                  double screenWidth = sizingInformation.screenSize.width;
-                  if (screenWidth < RefinedBreakpoints().desktopSmall) {
-                    return NavSectionMobile(scaffoldKey: _scaffoldKey);
-                  } else {
-                    return NavSectionWeb(
-                      navItems: navItems,
-                    );
-                  }
-                },
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                  controller: _scrollController,
-                  child: Column(
-                    children: [
-                      Stack(
-                        children: [
-                          Positioned.fill(
-                            child: Align(
-                              alignment: Alignment.center,
-                              child: Image.asset(ImagePath.BLOB_BEAN_ASH),
-                            ),
-                          ),
-                          Column(
-                            children: [
-                              HeaderSection(
-                                key: navItems[0].key,
-                              ),
-                              SizedBox(height: spacerHeight),
-                              VisibilityDetector(
-                                key: Key("about"),
-                                onVisibilityChanged: (visibilityInfo) {
-                                  double visiblePercentage =
-                                      visibilityInfo.visibleFraction * 100;
-                                  if (visiblePercentage > 10) {
-                                    _controller.forward();
-                                  }
-                                },
-                                child: Container(
-                                  key: navItems[1].key,
-                                  child: AboutMeSection(),
-                                ),
-                              ),
-                            ],
-                          )
-                        ],
-                      ),
-                      SizedBox(height: spacerHeight),
-                      Stack(
-                        children: [
-                          Positioned(
-                            top: assignWidth(context, 0.1),
-                            left: -assignWidth(context, 0.05),
-                            child: Image.asset(ImagePath.BLOB_FEMUR_ASH),
-                          ),
-                          Positioned(
-                            right: -assignWidth(context, 0.5),
-                            child: Image.asset(ImagePath.BLOB_SMALL_BEAN_ASH),
-                          ),
-                          Column(
-                            children: [
-                              Container(
-                                key: navItems[2].key,
-                                child: SkillsSection(),
-                              ),
-                              SizedBox(height: spacerHeight),
-                              StatisticsSection(),
-                              SizedBox(height: spacerHeight),
-                              Container(
-                                key: navItems[3].key,
-                                child: ProjectsSection(),
-                              ),
-                              SizedBox(height: spacerHeight),
-                              Container(
-                                key: navItems[4].key,
-                                child: WorkExperienceSection(),
-                              ),
-                              SizedBox(height: spacerHeight),
-                              Container(
-                                key: navItems[5].key,
-                                child: EducationSection(),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: spacerHeight),
-                      Stack(
-                        children: [
-                          Positioned(
-                            left: -assignWidth(context, 0.6),
-                            child: Image.asset(ImagePath.BLOB_ASH),
-                          ),
-                          Column(
-                            children: [
-                              Container(
-                                key: navItems[6].key,
-                                child: AwardsSection(),
-                              ),
-                              FooterSection(),
-                            ],
-                          )
-                        ],
-                      ),
-                    ],
+          body: SingleChildScrollView(
+            controller: _scrollController,
+            child: Column(
+              children: [
+                HeaderSection(
+                  key: navItems[0].key,
+                  onViewWork: _scrollToProjects,
+                ),
+                Container(
+                  key: navItems[1].key,
+                  child: VisibilityDetector(
+                    key: const Key('about'),
+                    onVisibilityChanged: (visibilityInfo) {
+                      if (visibilityInfo.visibleFraction * 100 > 10) {
+                        _controller.forward();
+                      }
+                    },
+                    child: const AboutMeSection(),
                   ),
                 ),
-              ),
-            ],
+                Container(
+                  key: navItems[2].key,
+                  child: const ServicesSection(),
+                ),
+                const TechStackSection(),
+                Container(
+                  key: navItems[3].key,
+                  child: ProjectsSection(),
+                ),
+                Container(
+                  key: navItems[4].key,
+                  child: const WorkExperienceSection(),
+                ),
+                const ProcessSection(),
+                Container(
+                  key: _contactKey,
+                  child: const FooterSection(),
+                ),
+                const SizedBox(height: 92),
+              ],
+            ),
           ),
         ),
-        // Floating WhatsApp Button
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: FloatingDockNav(
+            items: List.generate(
+              navItems.length,
+              (index) => DockItem(
+                icon: defaultDockIcons[index],
+                label: navItems[index].name,
+                isActive: _activeDockIndex == index,
+                onTap: () => _scrollToIndex(index),
+              ),
+            ),
+          ),
+        ),
         FloatingWhatsAppButton(
           phoneNumber: StringConst.WHATSAPP_NUMBER,
           message: StringConst.WHATSAPP_MESSAGE,
         ),
         FloatingGmailButton(
-          gmailAddress: 'Mominayaqoob00@gmail.com',
+          gmailAddress: StringConst.DEV_EMAIL,
           subject: 'Hello from Portfolio',
-        )
+        ),
       ],
     );
   }

@@ -1,285 +1,231 @@
-import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:nimbus/presentation/layout/adaptive.dart';
-import 'package:nimbus/presentation/pages/home/sections/header_section/widgets.dart';
 import 'package:nimbus/presentation/widgets/buttons/nimbus_button.dart';
-import 'package:nimbus/presentation/widgets/content_area.dart';
+import 'package:nimbus/presentation/widgets/hero_stats_row.dart';
+import 'package:nimbus/presentation/widgets/page_section.dart';
 import 'package:nimbus/presentation/widgets/spaces.dart';
+import 'package:nimbus/presentation/pages/home/sections/header_section/widgets.dart';
 import 'package:nimbus/values/values.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 
-const double bodyTextSizeLg = 16.0;
-const double bodyTextSizeSm = 14.0;
-const double socialTextSizeLg = 18.0;
-const double socialTextSizeSm = 14.0;
-// const double sidePadding = Sizes.PADDING_16;
+class HeaderSectionWeb extends StatelessWidget {
+  const HeaderSectionWeb({super.key, this.onViewWork});
 
-class HeaderSectionWeb extends StatefulWidget {
-  @override
-  _HeaderSectionWebState createState() => _HeaderSectionWebState();
-}
-
-class _HeaderSectionWebState extends State<HeaderSectionWeb>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(seconds: 20),
-      vsync: this,
-    )..repeat();
-
-    _controller.forward();
-    _controller.addListener(() {
-      if (_controller.status == AnimationStatus.completed) {
-        _controller.reset();
-        _controller.forward();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
+  final VoidCallback? onViewWork;
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    double headerIntroTextSize = responsiveSize(
-      context,
-      Sizes.TEXT_SIZE_24,
-      Sizes.TEXT_SIZE_56,
-      md: Sizes.TEXT_SIZE_36,
-    );
-    double bodyTextSize =
-        responsiveSize(context, bodyTextSizeSm, bodyTextSizeLg);
-    double socialTextSize =
-        responsiveSize(context, socialTextSizeSm, socialTextSizeLg);
-    double screenWidth = widthOfScreen(context);
-    double contentAreaWidth = screenWidth;
-    TextStyle? bodyTextStyle =
-        textTheme.bodyText1?.copyWith(fontSize: bodyTextSize);
-    TextStyle? socialTitleStyle =
-        textTheme.subtitle1?.copyWith(fontSize: socialTextSize);
+    final textTheme = Theme.of(context).textTheme;
 
-    List<Widget> cardsForTabletView = buildCardRow(
-      context: context,
-      data: Data.nimbusCardData,
-      width: contentAreaWidth * 0.4,
-      isWrap: true,
-    );
-    double buttonWidth = responsiveSize(
+    final headlineSize = responsiveSize(
       context,
-      80,
-      150,
-    );
-    double buttonHeight = responsiveSize(
-      context,
-      48,
-      60,
-      md: 54,
+      Sizes.TEXT_SIZE_30,
+      Sizes.TEXT_SIZE_48,
+      md: Sizes.TEXT_SIZE_40,
     );
 
-    double sizeOfBlobSm = screenWidth * 0.3;
-    double sizeOfGoldenGlobe = screenWidth * 0.2;
-    double dottedGoldenGlobeOffset = sizeOfBlobSm * 0.4;
-    double heightOfBlobAndGlobe =
-        computeHeight(dottedGoldenGlobeOffset, sizeOfGoldenGlobe, sizeOfBlobSm);
-    double heightOfStack = heightOfBlobAndGlobe * 2;
-    double blobOffset = heightOfStack * 0.3;
-    return ContentArea(
+    return PageSection(
+      showTopGlow: true,
+      paddingVertical: responsiveSize(context, 48, 80),
       child: Stack(
         children: [
-          Container(
-            height: heightOfStack,
-            child: Stack(
-              children: [
-                Stack(
-                  children: [
-                    Positioned(
-                      left: -(sizeOfBlobSm * 0.7),
-                      top: blobOffset,
-                      child: Image.asset(
-                        ImagePath.BLOB_BLACK,
-                        height: sizeOfBlobSm,
-                        width: sizeOfBlobSm,
-                      ),
-                    ),
-                    Positioned(
-                      left: -(sizeOfGoldenGlobe * 0.5),
-                      top: blobOffset + dottedGoldenGlobeOffset,
-                      child: RotationTransition(
-                        turns: _controller,
-                        child: Image.asset(
-                          ImagePath.DOTS_GLOBE_YELLOW,
-                          width: sizeOfGoldenGlobe,
-                          height: sizeOfGoldenGlobe,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                Positioned(
-                  right: -(sizeOfBlobSm * 0.4),
-                  child: HeaderImage(
-                    controller: _controller,
-                    globeSize: sizeOfGoldenGlobe,
-                    imageHeight: heightOfStack,
-                    imageOffset: Offset(-sizeOfBlobSm * 0.35, 0),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          const Positioned.fill(child: _HeroBackdrop()),
           Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Stack(
-                children: [
-                  Container(
-                    margin: EdgeInsets.only(top: heightOfStack * 0.05),
-                    child: SelectableText(
-                      StringConst.FIRST_NAME,
-                      style: textTheme.headline1?.copyWith(
-                        color: AppColors.grey50,
-                        fontSize: headerIntroTextSize * 2,
-                      ),
-                    ),
+              _HeroBadge(textTheme: textTheme),
+              SpaceH24(),
+              Text(
+                StringConst.HERO_TITLE_LINE_1,
+                textAlign: TextAlign.center,
+                style: textTheme.displaySmall?.copyWith(
+                  fontSize: headlineSize,
+                  fontWeight: FontWeight.w800,
+                  height: 1.15,
+                  letterSpacing: -0.5,
+                ),
+              ),
+              ShaderMask(
+                shaderCallback: (bounds) =>
+                    AppGradients.heroText.createShader(bounds),
+                child: Text(
+                  StringConst.HERO_TITLE_LINE_2,
+                  textAlign: TextAlign.center,
+                  style: textTheme.displaySmall?.copyWith(
+                    fontSize: headlineSize,
+                    color: AppColors.white,
+                    fontWeight: FontWeight.w800,
+                    height: 1.15,
+                    letterSpacing: -0.5,
                   ),
-                  Container(
-                    margin: EdgeInsets.only(
-                        top: heightOfStack * 0.2, left: (sizeOfBlobSm * 0.35)),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            ConstrainedBox(
-                              constraints:
-                                  BoxConstraints(maxWidth: screenWidth),
-                              child: AnimatedTextKit(
-                                animatedTexts: [
-                                  TypewriterAnimatedText(
-                                    StringConst.INTRO,
-                                    speed: Duration(milliseconds: 60),
-                                    textStyle: textTheme.headline2?.copyWith(
-                                      fontSize: headerIntroTextSize,
-                                    ),
-                                  ),
-                                ],
-                                onTap: () {},
-                                isRepeatingAnimation: true,
-                                totalRepeatCount: 5,
-                              ),
-                            ),
-                            ConstrainedBox(
-                              constraints:
-                                  BoxConstraints(maxWidth: screenWidth),
-                              child: AnimatedTextKit(
-                                animatedTexts: [
-                                  TypewriterAnimatedText(
-                                    StringConst.POSITION,
-                                    speed: Duration(milliseconds: 80),
-                                    textStyle: textTheme.headline2?.copyWith(
-                                      fontSize: headerIntroTextSize,
-                                      color: AppColors.primaryColor,
-                                      height: 1.2,
-                                    ),
-                                  ),
-                                ],
-                                onTap: () {},
-                                isRepeatingAnimation: true,
-                                totalRepeatCount: 5,
-                              ),
-                            ),
-                            SpaceH16(),
-                            ConstrainedBox(
-                              constraints:
-                                  BoxConstraints(maxWidth: screenWidth * 0.35),
-                              child: SelectableText(
-                                StringConst.ABOUT_DEV,
-                                style: bodyTextStyle?.copyWith(height: 1.5),
-                              ),
-                            ),
-                            SpaceH30(),
-                            Wrap(
-                              // mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SelectableText(
-                                      "${StringConst.EMAIL}:",
-                                      style: socialTitleStyle,
-                                    ),
-                                    SpaceH8(),
-                                    SelectableText(
-                                      "${StringConst.DEV_EMAIL_2}",
-                                      style: bodyTextStyle,
-                                    ),
-                                  ],
-                                ),
-                                SpaceW16(),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SelectableText(
-                                      "${StringConst.BEHANCE}:",
-                                      style: socialTitleStyle,
-                                    ),
-                                    SpaceH8(),
-                                    SelectableText(
-                                      "${StringConst.BEHANCE_ID}",
-                                      style: bodyTextStyle,
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            SpaceH40(),
-                            Row(
-                              children: [
-                                NimbusButton(
-                                  width: buttonWidth,
-                                  height: buttonHeight,
-                                  buttonTitle: StringConst.DOWNLOAD_CV,
-                                  buttonColor: AppColors.primaryColor,
-                                  opensUrl: true,
-                                  url: StringConst.DOWNLOAD_CV_URL,
-                                ),
-                                SpaceW16(),
-                                NimbusButton(
-                                  width: buttonWidth,
-                                  height: buttonHeight,
-                                  buttonTitle: StringConst.HIRE_ME_NOW,
-                                  opensUrl: true,
-                                  url: StringConst.HIRE_ME_FORM_URL,
-                                ),
-                              ],
-                            ),
-                            SpaceH30(),
-                            Wrap(
-                              children: buildSocialIcons(Data.socialData),
-                            )
-                          ],
-                        ),
-                      ],
-                    ),
+                ),
+              ),
+              SpaceH24(),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 680),
+                child: SelectableText(
+                  StringConst.ABOUT_DEV,
+                  textAlign: TextAlign.center,
+                  style: textTheme.bodyLarge?.copyWith(
+                    color: AppColors.grey250,
+                    height: 1.8,
+                    fontSize: 17,
+                  ),
+                ),
+              ),
+              SpaceH36(),
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 16,
+                runSpacing: 12,
+                children: [
+                  NimbusButton(
+                    width: 220,
+                    height: 52,
+                    buttonTitle: StringConst.HIRE_ME_NOW,
+                    buttonColor: AppColors.primaryColor,
+                    titleColor: AppColors.darkBackground,
+                    opensUrl: true,
+                    url: StringConst.MAILTO_SCHEME,
+                    borderRadius:
+                        const BorderRadius.all(Radius.circular(Sizes.RADIUS_10)),
+                  ),
+                  NimbusButton(
+                    width: 190,
+                    height: 52,
+                    buttonTitle: StringConst.VIEW_MY_WORK,
+                    buttonColor: AppColors.darkCard,
+                    titleColor: AppColors.white,
+                    onPressed: onViewWork,
+                    borderRadius:
+                        const BorderRadius.all(Radius.circular(Sizes.RADIUS_10)),
                   ),
                 ],
               ),
-              SizedBox(height: 150),
-              // Cards removed intentionally to avoid layout/text issues on web.
-              // Keep spacing so header layout remains stable.
-              SizedBox(height: 16),
+              SpaceH48(),
+              const HeroStatsRow(),
+              SpaceH24(),
+              Wrap(
+                alignment: WrapAlignment.center,
+                children: buildSocialIcons(Data.socialData),
+              ),
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _HeroBackdrop extends StatelessWidget {
+  const _HeroBackdrop();
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: CustomPaint(
+              painter: _GridPainter(color: AppColors.darkBorder.withOpacity(0.2)),
+            ),
+          ),
+          Positioned(
+            right: -120,
+            top: -10,
+            bottom: -10,
+            child: Container(
+              width: 380,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: [
+                    Colors.transparent,
+                    AppColors.primaryColor.withOpacity(0.35),
+                    AppColors.primaryColor.withOpacity(0.12),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            left: -80,
+            bottom: -80,
+            child: Container(
+              width: 280,
+              height: 280,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    AppColors.primaryColor.withOpacity(0.28),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _GridPainter extends CustomPainter {
+  _GridPainter({required this.color});
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 1;
+    const gap = 34.0;
+    for (double x = 0; x <= size.width; x += gap) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
+    }
+    for (double y = 0; y <= size.height; y += gap) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _GridPainter oldDelegate) {
+    return oldDelegate.color != color;
+  }
+}
+
+class _HeroBadge extends StatelessWidget {
+  const _HeroBadge({required this.textTheme});
+
+  final TextTheme textTheme;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.darkCard,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: AppColors.darkBorder),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primaryColor.withOpacity(0.22),
+            blurRadius: 18,
+            spreadRadius: 1,
+          ),
+        ],
+      ),
+      child: Text(
+        StringConst.HERO_BADGE,
+        style: textTheme.labelLarge?.copyWith(
+          color: AppColors.primaryColor,
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.3,
+        ),
       ),
     );
   }
